@@ -23,7 +23,7 @@ Using the Calls & SMS Viewer is incredibly simple. You don't need any special so
 
 Since this app is a single HTML file, you can get it in two ways:
 
-1.  **Directly from GitHub Pages:** Access the live version of the app hosted on [GitHub Pages]().
+1.  **Directly from GitHub Pages:** Access the live version of the app hosted on [GitHub Pages](https://shashotonur.github.io/calls-sms-viewer/).
 2.  **Download the Code:** Clone the repository or download the `index.html` file to your computer.
 
 ### Step 2: Open the Viewer
