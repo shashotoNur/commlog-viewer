@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calls & SMS Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        #contact-list {
+            width: 350px;
+            background-color: #1e1e1e;
+            overflow-y: auto;
+            border-right: 1px solid #333;
+            flex-shrink: 0;
+        }
+        #contact-list a {
+            display: block;
+            padding: 15px;
+            text-decoration: none;
+            color: #e0e0e0;
+            border-bottom: 1px solid #222;
+        }
+        #contact-list a:hover {
+            background-color: #2a2a2a;
+        }
+        #message-pane {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #message-header {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #message-header h2 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        #search-box-messages {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: #e0e0e0;
+            width: 250px;
+        }
+        #messages-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 18px;
+            max-width: 60%;
+            word-wrap: break-word;
+        }
+        .sms-received {
+            background-color: #333;
+            margin-right: auto;
+        }
+        .sms-sent {
+            background-color: #005c4b;
+            margin-left: auto;
+        }
+        .call-incoming {
+            background-color: #555;
+            margin-right: auto;
+        }
+        .call-outgoing {
+            background-color: #005c4b;
+            margin-left: auto;
+        }
+        .call-missed {
+            background-color: #900;
+            margin-right: auto;
+        }
+        .call-rejected {
+            background-color: #700;
+            margin-right: auto;
+        }
+        .message-content {
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+        .message-type, .message-date {
+            font-size: 0.7em;
+            color: #999;
+        }
+        .message-type {
+            font-style: italic;
+        }
+        .message-date {
+            text-align: right;
+        }
+        .date-divider {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 0.8em;
+            color: #888;
+            border-bottom: 1px solid #444;
+            line-height: 0.1em;
+        }
+        .date-divider span {
+            background: #121212;
+            padding: 0 10px;
+        }
+        #loading-message, #instruction {
+            padding: 20px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .file-input-container {
+            padding: 15px;
+            border-bottom: 1px solid #222;
+            display: flex;
+            gap: 1rem;
+        }
+        .file-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .file-input {
+            display: none;
+        }
+        .custom-file-upload {
+            background-color: #444;
+            color: #e0e0e0;
+            border: none;
+            border-radius: 3px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 10pt;
+            white-space: nowrap;
+        }
+        .custom-file-upload:hover {
+            background-color: #555;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-radius: 10px;
+            border: 2px solid #1e1e1e;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #666;
+        }
+        #search-box-contacts {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: #e0e0e0;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <div id="contact-list">
+        <div class="file-input-container">
+            <div class="file-input-wrapper">
+                <h4>Calls & SMS Viewer</h4>
+            </div>
+            <div class="file-input-wrapper">
+                <label for="sms-file-input" class="custom-file-upload">
+                    <svg width="2rem" height="1.2rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 9H17M7 13H17M21 20L17.6757 18.3378C17.4237 18.2118 17.2977 18.1488 17.1656 18.1044C17.0484 18.065 16.9277 18.0365 16.8052 18.0193C16.6672 18 16.5263 18 16.2446 18H6.2C5.07989 18 4.51984 18 4.09202 17.782C3.71569 17.5903 3.40973 17.2843 3.21799 16.908C3 16.4802 3 15.9201 3 14.8V7.2C3 6.07989 3 5.51984 3.21799 5.09202C3.40973 4.71569 3.71569 4.40973 4.09202 4.21799C4.51984 4 5.0799 4 6.2 4H17.8C18.9201 4 19.4802 4 19.908 4.21799C20.2843 4.40973 20.5903 4.71569 20.782 5.09202C21 5.51984 21 6.0799 21 7.2V20Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </label>
+                <input type="file" id="sms-file-input" class="file-input">
+            </div>
+            <div class="file-input-wrapper">
+                <label for="calls-file-input" class="custom-file-upload">
+                    <svg fill="#000000" width="2rem" height="1.2rem" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <title>phone-call</title>
+                    <path d="M18.037 6.635c-0.011-0.001-0.023-0.001-0.035-0.001-0.414 0-0.75 0.336-0.75 0.75 0 0.399 0.312 0.726 0.706 0.749l0.002 0c3.533 0.231 6.311 3.153 6.311 6.723 0 0.186-0.008 0.37-0.022 0.552l0.002-0.024c0 0.414 0.336 0.75 0.75 0.75s0.75-0.336 0.75-0.75v0c0.009-0.143 0.014-0.31 0.014-0.479 0-4.38-3.397-7.967-7.7-8.269l-0.026-0.001zM17.963 2.749c0.449 0.022 10.998 0.688 10.998 12.635 0 0.414 0.336 0.75 0.75 0.75s0.75-0.336 0.75-0.75v0c0.015-0.238 0.024-0.515 0.024-0.795 0-7.059-5.471-12.841-12.405-13.335l-0.043-0.002c-0.009-0-0.019-0.001-0.029-0.001-0.403 0-0.732 0.314-0.757 0.71l-0 0.002c-0.001 0.011-0.001 0.024-0.001 0.037 0 0.401 0.315 0.729 0.711 0.749l0.002 0zM30.637 23.15c-0.109-0.675-0.334-1.281-0.654-1.823l0.013 0.024c-0.114-0.186-0.301-0.317-0.521-0.353l-0.004-0.001-8.969-1.424c-0.035-0.006-0.076-0.009-0.117-0.009-0.207 0-0.395 0.083-0.531 0.218l0-0c-0.676 0.68-1.194 1.516-1.496 2.451l-0.012 0.044c-4.016-1.64-7.141-4.765-8.742-8.675l-0.038-0.105c0.978-0.314 1.814-0.833 2.493-1.509l-0 0c0.136-0.136 0.22-0.324 0.22-0.531 0-0.041-0.003-0.081-0.010-0.12l0.001 0.004-1.425-8.969c-0.036-0.224-0.167-0.412-0.35-0.524l-0.003-0.002c-0.505-0.301-1.094-0.522-1.724-0.626l-0.029-0.004c-0.315-0.070-0.677-0.111-1.048-0.111-0.025 0-0.050 0-0.075 0.001l0.004-0h-0.006c-3.497 0.024-6.326 2.855-6.347 6.351v0.002c0.015 12.761 10.355 23.102 23.115 23.117h0.002c3.5-0.023 6.331-2.854 6.354-6.351v-0.002c0-0.020 0-0.044 0-0.068 0-0.356-0.036-0.703-0.106-1.038l0.006 0.033zM24.383 29.076c-11.933-0.014-21.602-9.684-21.616-21.616v-0.001c0.019-2.673 2.182-4.835 4.854-4.853h0.002c0.016-0 0.036-0 0.055-0 0.272 0 0.537 0.030 0.793 0.086l-0.024-0.005c0.366 0.060 0.695 0.161 1.003 0.3l-0.025-0.010 1.302 8.202c-0.628 0.528-1.404 0.901-2.257 1.050l-0.029 0.004c-0.355 0.064-0.62 0.37-0.62 0.739 0 0.088 0.015 0.172 0.043 0.25l-0.002-0.005c1.772 5.072 5.695 8.994 10.646 10.729l0.121 0.037c0.073 0.026 0.157 0.041 0.245 0.041 0.368 0 0.674-0.265 0.737-0.615l0.001-0.005c0.153-0.882 0.526-1.658 1.061-2.295l-0.006 0.007 8.201 1.303c0.133 0.294 0.237 0.636 0.296 0.994l0.003 0.024c0.046 0.219 0.073 0.471 0.073 0.729 0 0.018-0 0.035-0 0.053l0-0.003c-0.016 2.675-2.179 4.84-4.852 4.859h-0.002z"></path>
+                    </svg>
+                </label>
+                <input type="file" id="calls-file-input" class="file-input">
+            </div>
+        </div>
+        <div style="padding: 10px;">
+            <input type="text" id="search-box-contacts" placeholder="Search contacts...">
+        </div>
+        <div id="contact-list-content">
+            <div id="instruction">Please load your XML files.</div>
+        </div>
+    </div>
+    
+    <div id="message-pane">
+        <div id="message-header" style="display: none;">
+            <h2 id="contact-name"></h2>
+            <input type="text" id="search-box-messages" placeholder="Search messages...">
+        </div>
+        <div id="messages-container">
+            <div id="loading-message" style="display: none;">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('sms-file-input').addEventListener('change', (evt) => handleFileSelect(evt, 'sms'), false);
+document.getElementById('calls-file-input').addEventListener('change', (evt) => handleFileSelect(evt, 'call'), false);
+document.getElementById('search-box-messages').addEventListener('input', handleMessageSearch, false);
+document.getElementById('search-box-contacts').addEventListener('input', handleContactSearch, false);
+
+let conversations = {};
+let allEvents = [];
+
+function handleFileSelect(evt, fileType) {
+    const file = evt.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                parseXml(e.target.result, fileType);
+            } catch (error) {
+                alert(`Error parsing ${fileType} XML file: ` + error.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+}
+
+function parseXml(xmlString, fileType) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+    const nodes = xmlDoc.getElementsByTagName(fileType);
+    
+    for (const node of nodes) {
+        const event = {
+            type: fileType,
+            data: node,
+            timestamp: parseInt(node.getAttribute('date'))
+        };
+        allEvents.push(event);
+    }
+    
+    organizeConversations();
+}
+
+function organizeConversations() {
+    conversations = {};
+    const tempConversations = {};
+    
+    allEvents.sort((a, b) => b.timestamp - a.timestamp);
+
+    allEvents.forEach(event => {
+        let contactName, address;
+        if (event.type === 'sms') {
+            address = event.data.getAttribute('address');
+            contactName = event.data.getAttribute('contact_name') && event.data.getAttribute('contact_name') !== "(Unknown)" ? event.data.getAttribute('contact_name') : address;
+        } else if (event.type === 'call') {
+            address = event.data.getAttribute('number');
+            contactName = event.data.getAttribute('contact_name') && event.data.getAttribute('contact_name') !== "(Unknown)" ? event.data.getAttribute('contact_name') : address;
+        }
+        
+        if (!tempConversations[contactName]) {
+            tempConversations[contactName] = { events: [], lastEventDate: 0, address: address };
+        }
+        
+        tempConversations[contactName].events.push(event);
+        if (event.timestamp > tempConversations[contactName].lastEventDate) {
+            tempConversations[contactName].lastEventDate = event.timestamp;
+        }
+    });
+
+    const sortedContacts = Object.keys(tempConversations).sort((a, b) => 
+        tempConversations[b].lastEventDate - tempConversations[a].lastEventDate
+    );
+
+    for(const contact of sortedContacts) {
+        conversations[contact] = tempConversations[contact];
+    }
+    
+    displayContactList();
+    if (sortedContacts.length > 0) {
+        displayMessages(sortedContacts[0]);
+    }
+}
+
+function displayContactList() {
+    const contactListDiv = document.getElementById('contact-list-content');
+    contactListDiv.innerHTML = '';
+    const sortedContacts = Object.keys(conversations);
+
+    sortedContacts.forEach(contact => {
+        const a = document.createElement('a');
+        a.href = '#';
+        a.textContent = contact;
+        a.setAttribute('data-address', conversations[contact].address);
+        a.onclick = (e) => {
+            e.preventDefault();
+            displayMessages(contact);
+        };
+        contactListDiv.appendChild(a);
+    });
+}
+
+function displayMessages(contact) {
+    currentContact = contact;
+    document.getElementById('message-header').style.display = 'flex';
+    document.getElementById('contact-name').textContent = `${contact} (${conversations[contact].address})`;
+    
+    const messagesContainer = document.getElementById('messages-container');
+    messagesContainer.innerHTML = '';
+    
+    const events = conversations[contact].events;
+    const sortedEvents = events.sort((a, b) => a.timestamp - b.timestamp);
+    
+    let lastDate = null;
+    
+    sortedEvents.forEach(event => {
+        const readableDateStr = event.data.getAttribute('readable_date');
+        const eventDate = new Date(readableDateStr);
+        const currentDate = eventDate.toLocaleDateString();
+
+        if (currentDate !== lastDate) {
+            const dateDivider = document.createElement('div');
+            dateDivider.className = 'date-divider';
+            dateDivider.innerHTML = `<span>${currentDate}</span>`;
+            messagesContainer.appendChild(dateDivider);
+            lastDate = currentDate;
+        }
+        
+        const messageDiv = document.createElement('div');
+        let contentHTML = '';
+        let messageClass = '';
+        let typeText = '';
+
+        if (event.type === 'sms') {
+            const smsType = event.data.getAttribute('type');
+            messageClass = `message sms-${smsType === '1' ? 'received' : 'sent'}`;
+            typeText = smsType === '1' ? 'SMS (Received)' : 'SMS (Sent)';
+            contentHTML = `
+                <div class="message-content">${event.data.getAttribute('body')}</div>
+                <div class="message-type">${typeText}</div>
+            `;
+        } else if (event.type === 'call') {
+            const callType = event.data.getAttribute('type');
+            let callTypeDesc;
+            switch(callType) {
+                case '1': messageClass = 'message call-incoming'; callTypeDesc = 'Incoming'; break;
+                case '2': messageClass = 'message call-outgoing'; callTypeDesc = 'Outgoing'; break;
+                case '3': messageClass = 'message call-missed'; callTypeDesc = 'Missed'; break;
+                case '5': messageClass = 'message call-rejected'; callTypeDesc = 'Rejected'; break;
+                default: messageClass = 'message call-incoming'; callTypeDesc = 'Unknown';
+            }
+            
+            const duration = event.data.getAttribute('duration');
+            typeText = `Call (${callTypeDesc})`;
+            contentHTML = `
+                <div class="message-content">${typeText}</div>
+                <div class="message-type">Duration: ${formatDuration(duration)}</div>
+            `;
+        }
+        
+        messageDiv.className = messageClass;
+        messageDiv.innerHTML = `${contentHTML}<div class="message-date">${readableDateStr}</div>`;
+        messagesContainer.appendChild(messageDiv);
+    });
+    
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function formatDuration(seconds) {
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds}s`;
+}
+
+function handleMessageSearch(evt) {
+    const searchTerm = evt.target.value.toLowerCase();
+    const messagesContainer = document.getElementById('messages-container');
+    const messages = messagesContainer.querySelectorAll('.message');
+    
+    messages.forEach(message => {
+        const details = message.textContent.toLowerCase();
+        message.style.display = details.includes(searchTerm) || searchTerm === '' ? 'block' : 'none';
+    });
+    
+    const dividers = messagesContainer.querySelectorAll('.date-divider');
+    dividers.forEach(divider => {
+        let hasVisibleMessages = false;
+        let nextSibling = divider.nextElementSibling;
+        while(nextSibling && !nextSibling.className.includes('date-divider')) {
+            if (nextSibling.style.display !== 'none') {
+                hasVisibleMessages = true;
+                break;
+            }
+            nextSibling = nextSibling.nextElementSibling;
+        }
+        divider.style.display = hasVisibleMessages ? 'block' : 'none';
+    });
+}
+
+function handleContactSearch(evt) {
+    const searchTerm = evt.target.value.toLowerCase();
+    const contactListContent = document.getElementById('contact-list-content');
+    const contacts = contactListContent.querySelectorAll('a');
+
+    contacts.forEach(contact => {
+        const name = contact.textContent.toLowerCase();
+        const address = contact.getAttribute('data-address').toLowerCase();
+        if (name.includes(searchTerm) || address.includes(searchTerm) || searchTerm === '') {
+            contact.style.display = 'block';
+        } else {
+            contact.style.display = 'none';
+        }
+    });
+}
+</script>
+
+</body>
+</html>
