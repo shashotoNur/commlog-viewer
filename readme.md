@@ -1,6 +1,6 @@
-# Calls & SMS Viewer
+# Commlog Viewer
 
-A lightweight, local-first web tool for viewing and managing your combined call logs and SMS backups. This single HTML file runs entirely in your browser, ensuring your data remains private and secure on your device.
+A lightweight, local-first web tool for viewing and managing your combined communication log, i.e. call logs and SMS backups. This single HTML file runs entirely in your browser, ensuring your data remains private and secure on your device.
 
 -----
 
@@ -17,13 +17,13 @@ A lightweight, local-first web tool for viewing and managing your combined call 
 
 ## Usage
 
-Using the Calls & SMS Viewer is incredibly simple. You don't need any special software—just a modern web browser.
+Using the Commlog Viewer is incredibly simple. You don't need any special software—just a modern web browser.
 
 ### Step 1: Get the Viewer
 
 Since this app is a single HTML file, you can get it in two ways:
 
-1.  **Directly from GitHub Pages:** Access the live version of the app hosted on [GitHub Pages](https://shashotonur.github.io/calls-sms-viewer/).
+1.  **Directly from GitHub Pages:** Access the live version of the app hosted on [GitHub Pages](https://shashotonur.github.io/commlog-viewer/).
 2.  **Download the Code:** Clone the repository or download the `index.html` file to your computer.
 
 ### Step 2: Open the Viewer
