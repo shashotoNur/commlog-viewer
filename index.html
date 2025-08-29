@@ -2,9 +2,13 @@
 <html>
     <head>
         <title>Commlog Viewer</title>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
         <style>
             body {
-                font-family: Arial, sans-serif;
+                font-family: 'Courier New', Courier, monospace;
                 margin: 0;
                 padding: 0;
                 background-color: #121212;
@@ -30,7 +34,7 @@
                 padding: 15px;
                 text-decoration: none;
                 color: #e0e0e0;
-                border-bottom: 1px solid #222;
+                border-bottom: 1px solid #555;
             }
             #contact-list a:hover {
                 background-color: #2a2a2a;
@@ -38,6 +42,7 @@
             #message-pane {
                 flex-grow: 1;
                 display: flex;
+                background-color: #1e1e1e;
                 flex-direction: column;
             }
             #message-header {
@@ -51,14 +56,15 @@
             #message-header h2 {
                 margin: 0;
                 font-size: 1.2em;
+                width: 50%;
             }
             #search-box-messages {
-                padding: 8px;
+                padding: 2%;
                 border-radius: 5px;
                 border: 1px solid #444;
                 background-color: #333;
                 color: #e0e0e0;
-                width: 250px;
+                width: 46%;
             }
             #messages-container {
                 flex-grow: 1;
@@ -124,7 +130,7 @@
                 background: #121212;
                 padding: 0 10px;
             }
-            #loading-message, #instruction {
+            #loading-message, .instruction {
                 padding: 20px;
                 text-align: center;
                 font-size: 1.1em;
@@ -187,6 +193,33 @@
                 font-size: 1em;
                 margin-bottom: 10px;
             }
+            #back-button {
+                display: block;
+                background: none;
+                border: none;
+                color: #e0e0e0;
+                font-size: 1.5rem;
+                cursor: pointer;
+                margin-right: 10px;
+            }
+            /* --------------------------------------------- */
+            @media (max-width: 768px) {
+                #contact-list {
+                    width: 99.9%;
+                }
+                #message-pane {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: 100%;
+                    width: 100%;
+                    display: none;
+                }
+                #message-header h2 {
+                    margin: 0;
+                    font-size: 1em;
+                }
+            }
         </style>
     </head>
     <body>
@@ -199,7 +232,7 @@
                 </div>
                 <div class="file-input-wrapper">
                     <label for="file-input" class="custom-file-upload" title="Enter XML Backup File">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="--darkreader-inline-stroke: var(--darkreader-text-000000, #e8e6e3);" data-darkreader-inline-stroke=""><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 22h14a2 2 0 002-2V7.5L14.5 2H6a2 2 0 00-2 2v4"></path> <path d="M14 2v6h6"></path> <path d="M2 15h10"></path> <path d="M9 18l3-3-3-3"></path> </g></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="--darkreader-inline-stroke: var(--darkreader-text-000000, #e8e6e3);" data-darkreader-inline-stroke=""><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 22h14a2 2 0 002-2V7.5L14.5 2H6a2 2 0 00-2 2v4"></path> <path d="M14 2v6h6"></path> <path d="M2 15h10"></path> <path d="M9 18l3-3-3-3"></path> </g></svg>
                     </label>
                     <input type="file" id="file-input" class="file-input">
                 </div>
@@ -208,24 +241,26 @@
                 <input type="text" id="search-box-contacts" placeholder="Search contacts...">
             </div>
             <div id="contact-list-content">
-                <div id="instruction">Please load your XML files.</div>
+                <div class="instruction">Please load your XML file(s).</div>
             </div>
         </div>
 
         <div id="message-pane">
             <div id="message-header" style="display: none;">
+                <button id="back-button">←</button>
                 <h2 id="contact-name"></h2>
                 <input type="text" id="search-box-messages" placeholder="Search messages...">
             </div>
             <div id="messages-container">
                 <div id="loading-message" style="display: none;">Loading...</div>
+                <div class="instruction" id="select-conversation" style="display: none;">Select a conversation</div>
             </div>
         </div>
     </div>
 
     <script>
         const svgFavicon = `
-            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#fff">
                 <path d="M16.8 14.5l3.2-3.2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h2v5l8.7-8.7 2.1 2.2z" />
                 <path d="M22.6 11.1l-6.1 6.1-2.1-2.2-1.4 1.4 3.5 3.6 7.5-7.6" />
             </svg>
@@ -242,23 +277,29 @@
         document.getElementById('file-input').addEventListener('change', (evt) => handleFileSelect(evt), false);
         document.getElementById('search-box-messages').addEventListener('input', handleMessageSearch, false);
         document.getElementById('search-box-contacts').addEventListener('input', handleContactSearch, false);
+        document.getElementById('back-button').addEventListener('click', goBackToContacts);
 
         let conversations = {};
         let allEvents = [];
+        const processedFiles = new Set();
 
         function handleFileSelect(evt) {
             const file = evt.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        parseXml(e.target.result);
-                    } catch (error) {
-                        alert(`Error parsing XML file: ` + error.message);
-                    }
-                };
-                reader.readAsText(file);
-            }
+            if (!file) return alert("No file found! Try again");
+
+            if (processedFiles.has(file.name))
+                return alert(`The file "${file.name}" has already been loaded.`);
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    parseXml(e.target.result);
+                    processedFiles.add(file.name);
+                } catch (error) {
+                    alert(`Error parsing XML file: ` + error.message);
+                }
+            };
+            reader.readAsText(file);
         }
 
         function parseXml(xmlString) {
@@ -300,9 +341,8 @@
                     tempConversations[contactName] = { events: [], lastEventDate: 0, address: address };
 
                 tempConversations[contactName].events.push(event);
-                if (event.timestamp > tempConversations[contactName].lastEventDate) {
+                if (event.timestamp > tempConversations[contactName].lastEventDate)
                     tempConversations[contactName].lastEventDate = event.timestamp;
-                }
             });
 
             for(const contact of Object.keys(tempConversations)) {
@@ -310,7 +350,8 @@
             }
 
             displayContactList();
-            if (tempConversations.length > 0) displayMessages(tempConversations[0]);
+            const selectConversation = document.getElementById("select-conversation");
+            selectConversation && (selectConversation.style.display = "block");
         }
 
         function displayContactList() {
@@ -334,9 +375,10 @@
         }
 
         function displayMessages(contact) {
-            currentContact = contact;
+            const addStr = contact !== conversations[contact].address ? ` (${conversations[contact].address})` : '';
+            document.getElementById('message-pane').style.display = 'flex';
             document.getElementById('message-header').style.display = 'flex';
-            document.getElementById('contact-name').textContent = `${contact} (${conversations[contact].address})`;
+            document.getElementById('contact-name').textContent = `${contact}${addStr}`;
 
             const messagesContainer = document.getElementById('messages-container');
             messagesContainer.innerHTML = '';
@@ -446,7 +488,11 @@
                 }
             });
         }
-    </script>
 
+        function goBackToContacts() {
+            document.getElementById('message-pane').style.display = 'none';
+        }
+
+    </script>
     </body>
 </html>
